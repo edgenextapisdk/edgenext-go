@@ -1,10 +1,10 @@
-# lalcsafe.com api sdk for go
+# edgenext.com api sdk for go
 
 ### 说明
 
 * 接口基地址，如： https://api.local.com/V4/ , 请具体咨询运营人员
 * 接口遵循RESTful,默认请求体json,接口默认返回json
-* app_id, app_secret 联系技术客服，先注册一个lalcsafe.com的账号，用于申请绑定api身份
+* app_id, app_secret 联系技术客服，先注册一个edgenext的账号，用于申请绑定api身份
 * 文档 [![GoDoc](https://godoc.org/github.com/pr2apisdk/pr2apisdk_go/sdk?status.svg)](https://godoc.org/github.com/pr2apisdk/pr2apisdk_go/sdk)
 
 ### 签名算法
