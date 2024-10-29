@@ -2,10 +2,8 @@
 
 ### 说明
 
-* 接口基地址，如： https://api.local.com/V4/ , 请具体咨询运营人员
-* 接口遵循RESTful,默认请求体json,接口默认返回json
-* app_id, app_secret 联系技术客服，先注册一个edgenext的账号，用于申请绑定api身份
-* 文档 [![GoDoc](https://godoc.org/github.com/pr2apisdk/pr2apisdk_go/sdk?status.svg)](https://godoc.org/github.com/pr2apisdk/pr2apisdk_go/sdk)
+* edgenext scdn产品，官网地址：https://www.edgenext.com/
+* 接口遵循RESTful，默认请求体json，接口默认返回json
 
 ### 签名算法
 
@@ -20,7 +18,7 @@
 * 参数说明
     * AppId 分配的app_id
     * appSecert 分配的appSecert, 用于签名数据
-    * apiUrlPre api地址前缀
+    * apiUrlPre api地址前缀, 请具体咨询运营人员
     * userId 当前使用者的用户ID
 * 每次调用会返回JSONObject, 如果执行过程中有异常，会直接抛出异常；
 * 如果需要调试，可以调用debug方法
@@ -30,7 +28,7 @@
 ## 安装
 
 ```
-go get github.com/pr2apisdk/pr2apisdk_go
+go get github.com/edgenextapisdk/edgenext-go
 ```
 
 ### 使用
@@ -41,7 +39,7 @@ package main
 
 import (
         "os"
-        sdk "github.com/pr2apisdk/pr2apisdk_go"
+        sdk "github.com/edgenextapisdk/edgenext-go"
         "fmt"
 )
 
