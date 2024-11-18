@@ -6,67 +6,21 @@ import (
 	"testing"
 )
 
-func TestMapStrval(t *testing.T) {
-	var vInt8 int8 = 3
-	var vuInt8 uint8 = 3
-	var vInt16 int16 = 3
-	var vuInt16 uint16 = 3
-	var vInt32 int32 = 3
-	var vuInt32 uint32 = 3
-	var vInt64 int64 = 3
-	var vuInt64 uint64 = 3
-	data := map[string]interface{}{
-		"age":          10,
-		"name":         "name",
-		"int8":         vInt8,
-		"uint8":        vuInt8,
-		"int16":        vInt16,
-		"uint16":       vuInt16,
-		"int32":        vInt32,
-		"uint32":       vuInt32,
-		"int64":        vInt64,
-		"uint64":       vuInt64,
-		"bytes":        []byte("hello"),
-		"ids_ints":     []int{1, 2, 3},
-		"ids_int64s":   []int64{1, 2, 3},
-		"fen_float32s": []float32{1.0, 2.5, 3.9},
-		"fen_float64s": []float64{1.0, 2.5, 3.9},
-		"bools":        []bool{true, false, true},
-		"fen_strs":     []float64{1, 2, 3},
-		"childs": []interface{}{
-			map[string]interface{}{
-				"age":  1,
-				"name": "name_childs_name",
-			},
-		},
-	}
-	fmt.Println("MapStrval data: ", data)
-	query, err := MapStrval(data)
-	fmt.Println("MapStrval data strval: ", query)
-	fmt.Println("MapStrval err: ", err)
-	fmt.Println("")
-}
-
 func TestGet(t *testing.T) {
 	var sdk = Sdk{
-		AppId:     os.Getenv("SDK_APP_ID"),
-		AppSecret: os.Getenv("SDK_APP_SECERT"),
-		ApiPre:    os.Getenv("SDK_API_PRE"),
+		AppId:     "ENAK195892d9c30371985983",
+		AppSecret: "57dbcb07eb4e1d5aa531afee2c4d8f26",
+		ApiPre:    "http://127.0.0.1:60041/api/V4/",
 		UserId:    1,
 		Timeout:   30,
 	}
 	var err error
 	var reqParams ReqParams
 	var resp *Response
-	api := "test.sdk.get"
+	api := "Web.Domain.Info"
 	reqParams = ReqParams{
 		Query: map[string]interface{}{
-			"page":     1,
-			"pagesize": 10,
-			"data": map[string]interface{}{
-				"name":   "name名称",
-				"domain": "baidu.com",
-			},
+			"domain": 101153,
 		},
 	}
 	resp, err = sdk.Get(api, reqParams)
