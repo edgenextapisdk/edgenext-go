@@ -187,22 +187,22 @@ func (sdk *Sdk) Request(uri, method string, reqParams ReqParams) (*Response, err
 	return &response, err
 }
 
-// GET 请求
+// Get GET 请求
 func (sdk *Sdk) Get(api string, reqParams ReqParams) (*Response, error) {
 	return sdk.Request(api, "GET", reqParams)
 }
 
-// POST 请求
+// Post POST 请求
 func (sdk *Sdk) Post(api string, reqParams ReqParams) (*Response, error) {
 	return sdk.Request(api, "POST", reqParams)
 }
 
-// PUT 请求
+// Put PUT 请求
 func (sdk *Sdk) Put(api string, reqParams ReqParams) (*Response, error) {
 	return sdk.Request(api, "PUT", reqParams)
 }
 
-// DELETE 请求
+// Delete DELETE 请求
 func (sdk *Sdk) Delete(api string, reqParams ReqParams) (*Response, error) {
 	return sdk.Request(api, "DELETE", reqParams)
 }

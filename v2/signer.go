@@ -208,3 +208,16 @@ func (s *Signer) Sign(request *http.Request) error {
 	request.Header.Set("X-Auth-Sign", signatureStr)
 	return nil
 }
+
+func (s *Signer) Verify(request *http.Request) error {
+	signatureStr, err := s.sign(request)
+	if err != nil {
+		return err
+	}
+	// req sign
+	reqAuth := request.Header.Get("X-Auth-Sign")
+	if signatureStr != reqAuth {
+		return fmt.Errorf("auth failed")
+	}
+	return nil
+}

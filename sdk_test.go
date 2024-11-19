@@ -8,8 +8,10 @@ import (
 
 func TestGet(t *testing.T) {
 	var sdk = Sdk{
-		AppId:     "ENAK195892d9c30371985983",
-		AppSecret: "57dbcb07eb4e1d5aa531afee2c4d8f26",
+		// 认证用的ak和sk硬编码到代码中或者明文存储都有很大的安全风险，建议在配置文件或者环境变量中密文存放，使用时解密，确保安全；
+		// 本示例以ak和sk保存在环境变量中为例，运行本示例前请先在本地环境中设置环境变量X-App-Id和X-App-Secret。
+		AppId:     os.Getenv("X-App-Id"),
+		AppSecret: os.Getenv("X-App-Secret"),
 		ApiPre:    "http://127.0.0.1:60041/api/V4/",
 		UserId:    1,
 		Timeout:   30,
