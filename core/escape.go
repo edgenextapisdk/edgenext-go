@@ -1,4 +1,4 @@
-package v2
+package core
 
 func shouldEscape(c byte) bool {
 	if 'A' <= c && c <= 'Z' || 'a' <= c && c <= 'z' || '0' <= c && c <= '9' || c == '_' || c == '-' || c == '~' || c == '.' {

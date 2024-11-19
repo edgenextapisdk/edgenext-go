@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	sdk "github.com/edgenextapisdk/edgenext-go"
+	sdk "github.com/edgenextapisdk/edgenext-go/v2"
 	"os"
 )
 
