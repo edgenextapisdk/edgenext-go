@@ -1,4 +1,4 @@
-module github.com/edgenextapisdk/edgenext-go/v2
+module github.com/edgenextapisdk/edgenext-go/v1
 
 go 1.16
 
