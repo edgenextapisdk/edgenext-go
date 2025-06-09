@@ -3,7 +3,7 @@ package sdk
 import (
 	"encoding/json"
 	"fmt"
-	v2 "github.com/edgenextapisdk/edgenext-go/v1/core"
+	v2 "github.com/edgenextapisdk/edgenext-go/core"
 	"github.com/gogf/gf/v2/util/gconv"
 	"io"
 	"net/http"
