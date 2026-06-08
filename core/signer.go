@@ -110,7 +110,7 @@ func CanonicalHeaders(request *http.Request, signerHeaders []string) string {
 	return fmt.Sprintf("%s\n", strings.Join(canonicalHeaders, "\n"))
 }
 
-// SignedHeaders 取出头部所有的key -> 转换成小写 -> 排序
+// SignedHeaders returns lower-cased request header keys sorted alphabetically.
 func SignedHeaders(r *http.Request) []string {
 	var signedHeaders []string
 	for key := range r.Header {
@@ -120,7 +120,7 @@ func SignedHeaders(r *http.Request) []string {
 	return signedHeaders
 }
 
-// RequestPayload 读取body
+// RequestPayload reads the request body and restores it for later consumers.
 func RequestPayload(request *http.Request) ([]byte, error) {
 	if request.Body == nil {
 		return []byte(""), nil
@@ -182,7 +182,7 @@ func (s *Signer) sign(request *http.Request) (string, error) {
 		t = time.Now()
 		request.Header.Set(HeaderXDateTime, t.UTC().Format(DateFormat))
 	}
-	// 取出头部key
+	// Collect the header keys included in the signature.
 	signedHeaders := SignedHeaders(request)
 	canonicalRequest, err := CanonicalRequest(request, signedHeaders)
 	if err != nil {

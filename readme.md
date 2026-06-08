@@ -1,18 +1,6 @@
 # EdgeNext Go SDK
 
-[![Go Version](https://img.shields.io/badge/go-%3E%3D1.14-blue.svg)](https://golang.org/)
-[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
-
-Official Go SDK for EdgeNext SCDN API. EdgeNext is a global CDN and edge computing platform. Visit [edgenext.com](https://www.edgenext.com/) for more information.
-
-## Features
-
-- ✅ Full RESTful API support (GET, POST, PUT, PATCH, DELETE)
-- ✅ Automatic request signing with SHA256 algorithm
-- ✅ Type-safe request/response handling
-- ✅ Built-in error handling and response parsing
-- ✅ Support for query parameters, request body, and custom headers
-- ✅ Configurable timeout settings
+Official Go SDK for EdgeNext SCDN APIs.
 
 ## Installation
 
@@ -22,9 +10,12 @@ go get github.com/edgenextapisdk/edgenext-go
 
 ## Requirements
 
-- Go >= 1.18
+- Go 1.18 or later
+- EdgeNext `AppId`, `AppSecret`, and API endpoint prefix
 
 ## Quick Start
+
+Use `NewEdgeNextClient` to initialize the SDK and call generated API wrappers.
 
 ```go
 package main
@@ -32,216 +23,198 @@ package main
 import (
     "fmt"
     "os"
-    sdk "github.com/edgenextapisdk/edgenext-go"
+
+    edgenext "github.com/edgenextapisdk/edgenext-go"
 )
 
 func main() {
-    // Initialize SDK
-    sdkObj := sdk.Sdk{
-        AppId:     os.Getenv("SDK_APP_ID"),
-        AppSecret: os.Getenv("SDK_APP_SECRET"),
-        ApiPre:    os.Getenv("SDK_API_PRE"),
+    client := edgenext.NewEdgeNextClient(edgenext.EdgeNextClientConfig{
+        AppId:     os.Getenv("EDGENEXT_APP_ID"),
+        AppSecret: os.Getenv("EDGENEXT_APP_SECRET"),
+        ApiPre:    os.Getenv("EDGENEXT_API_PRE"),
+        UserId:    1,
         Timeout:   30,
-    }
+    }, edgenext.WithLanguage("en"))
 
-    // Make a GET request
-    reqParams := sdk.ReqParams{
-        Query: map[string]interface{}{
-            "page":     1,
-            "pagesize": 10,
-        },
-    }
-
-    resp, err := sdkObj.Get("test.sdk.get", reqParams)
+    resp, err := client.ListDomains(&edgenext.ListDomainsRequest{
+        Page:     1,
+        PageSize: 20,
+    })
     if err != nil {
-        fmt.Printf("Request error: %v\n", err)
+        fmt.Printf("request failed: %v\n", err)
         return
     }
 
-    if resp.BizCode == 1 {
-        fmt.Println("Success:", resp.BizData)
-    } else {
-        fmt.Printf("Business error: %s\n", resp.BizMsg)
+    fmt.Printf("total domains: %v\n", resp.Data.Total)
+    for _, domain := range resp.Data.List {
+        fmt.Printf("domain: %s\n", domain.Domain)
     }
 }
 ```
 
 ## Configuration
 
-### SDK Parameters
+`EdgeNextClientConfig` is the recommended way to create a client.
 
-| Parameter | Type | Description | Required |
-|-----------|------|-------------|----------|
-| `AppId` | `string` | Your application ID provided by EdgeNext | Yes |
-| `AppSecret` | `string` | Your application secret for request signing | Yes |
-| `ApiPre` | `string` | API endpoint prefix (consult operations team for details) | Yes |
-| `Timeout` | `int` | Request timeout in seconds (default: 30) | No |
-| `Debug` | `bool` | Enable debug mode | No |
+| Field | Type | Required | Description |
+| --- | --- | --- | --- |
+| `AppId` | `string` | Yes | Application ID provided by EdgeNext. |
+| `AppSecret` | `string` | Yes | Application secret used for request signing. |
+| `ApiPre` | `string` | Yes | API endpoint prefix, for example `https://example.com/api/v5`. |
+| `UserId` | `int` | No | User ID passed in SDK payload fields. |
+| `Timeout` | `int` | No | Request timeout in seconds. Defaults to `30` when unset. |
+| `Debug` | `bool` | No | Reserved debug flag. |
 
-## Usage
-
-### Request Parameters
-
-The `ReqParams` struct supports three optional properties:
-
-- **Query**: Query parameters for GET requests (`map[string]interface{}`)
-- **Data**: Request body for non-GET requests (`map[string]interface{}`)
-- **Headers**: Custom HTTP headers (`map[string]string`)
-
-### Response Structure
-
-The `Response` struct contains the following fields:
-
-- **HttpCode**: HTTP status code (200 for success)
-- **RespBody**: Raw response body as string
-- **BizCode**: Business status code (1 = success, others = failure)
-- **BizMsg**: Business status message
-- **BizData**: Business data (only available when BizCode is 1)
-
-### Examples
-
-#### GET Request
+If you already have an `Sdk` instance, initialize the wrapper client with `NewEdgeNextClientFromSDK`:
 
 ```go
-api := "test.sdk.get"
-reqParams := sdk.ReqParams{
+sdkObj := &edgenext.Sdk{
+    AppId:     os.Getenv("EDGENEXT_APP_ID"),
+    AppSecret: os.Getenv("EDGENEXT_APP_SECRET"),
+    ApiPre:    os.Getenv("EDGENEXT_API_PRE"),
+    UserId:    1,
+    Timeout:   30,
+}
+
+client := edgenext.NewEdgeNextClientFromSDK(sdkObj)
+```
+
+## Generated API Wrappers
+
+Generated wrapper methods provide typed request structs for common APIs. Prefer these methods when a wrapper exists.
+
+### Query Domains
+
+```go
+resp, err := client.ListDomains(&edgenext.ListDomainsRequest{
+    Page:     1,
+    PageSize: 20,
+    Domain:   "example.com",
+})
+```
+
+### Add Domain
+
+```go
+resp, err := client.AddDomains(&edgenext.AddDomainsRequest{
+    Domain:  "www.example.com",
+    GroupId: 1,
+    Origins: []map[string]interface{}{
+        {"addr": "192.0.2.10", "weight": 1},
+    },
+})
+```
+
+### Update Domain
+
+```go
+resp, err := client.UpdateDomains(&edgenext.UpdateDomainsRequest{
+    DomainId: 123,
+    Remark:   "updated by sdk",
+})
+```
+
+### Delete Domains
+
+```go
+resp, err := client.DeleteDomains(&edgenext.DeleteDomainsRequest{
+    Ids: []int{123, 456},
+})
+```
+
+## Low-Level Requests
+
+`EdgeNextClient` also exposes the original SDK request methods:
+
+- `Request(api, method, params)`
+- `Get(api, params)`
+- `Post(api, params)`
+- `Put(api, params)`
+- `Delete(api, params)`
+
+Use these methods when you need to call an API that does not have a generated wrapper yet.
+
+```go
+resp, err := client.Post("test.sdk.post", edgenext.ReqParams{
+    Data: map[string]interface{}{
+        "name": "example",
+    },
+    Headers: map[string]string{
+        "X-Request-Id": "req-001",
+    },
+})
+```
+
+For GET requests, put query parameters in `ReqParams.Query`:
+
+```go
+resp, err := client.Get("test.sdk.get", edgenext.ReqParams{
     Query: map[string]interface{}{
-        "page":     1,
-        "pagesize": 10,
-        "data": map[string]interface{}{
-            "name":   "example",
-            "domain": "example.com",
-        },
+        "page":      1,
+        "page_size": 20,
     },
-}
-
-resp, err := sdkObj.Get(api, reqParams)
-if err == nil && resp.BizCode == 1 {
-    fmt.Println("Success:", resp.BizData)
-}
+})
 ```
 
-#### POST Request
+## Request Parameters
+
+`ReqParams` supports:
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `Query` | `map[string]interface{}` | URL query parameters. |
+| `Data` | `map[string]interface{}` | JSON request body for non-GET requests. |
+| `Headers` | `map[string]string` | Per-request custom headers. |
+
+Default headers can be configured on the client:
 
 ```go
-api := "test.sdk.post"
-reqParams := sdk.ReqParams{
-    Data: map[string]interface{}{
-        "name": 1,
-        "age":  10,
-        "data": map[string]interface{}{
-            "name":   "example",
-            "domain": "example.com",
-        },
-    },
-}
-
-resp, err := sdkObj.Post(api, reqParams)
-if err == nil && resp.BizCode == 1 {
-    fmt.Println("Success:", resp.BizData)
-}
+client := edgenext.NewEdgeNextClient(config,
+    edgenext.WithLanguage("en"),
+    edgenext.WithDefaultHeaders(map[string]string{
+        "X-Client": "my-service",
+    }),
+)
 ```
 
-#### PUT Request
+Per-request headers override default headers with the same key.
+
+## Response Handling
+
+Generated wrapper methods return endpoint-specific response structs, for example `(*ListDomainsResponse, error)`. Dynamic low-level calls return `(*APIResponse, error)`.
+
+| Field | Description |
+| --- | --- |
+| `Status.Code` | Business status code from `status.code`. |
+| `Status.Message` | Business message from `status.message`. |
+| `Data` | Typed business payload generated from apidoc `@apiSuccess data.*` fields for endpoint wrappers. |
+
+Always check `error`. HTTP errors, malformed responses, and non-success business status codes are returned as `error`. On success, generated wrappers expose typed apidoc response fields:
 
 ```go
-api := "test.sdk.put"
-reqParams := sdk.ReqParams{
-    Data: map[string]interface{}{
-        "id":   10,
-        "name": "updated_name",
-    },
-}
-
-resp, err := sdkObj.Put(api, reqParams)
-if err == nil && resp.BizCode == 1 {
-    fmt.Println("Success:", resp.BizData)
-}
-```
-
-#### DELETE Request
-
-```go
-api := "test.sdk.delete"
-reqParams := sdk.ReqParams{
-    Data: map[string]interface{}{
-        "id": 10,
-    },
-}
-
-resp, err := sdkObj.Delete(api, reqParams)
-if err == nil && resp.BizCode == 1 {
-    fmt.Println("Success:", resp.BizData)
-}
-```
-
-## Authentication & Signing
-
-The SDK uses SHA256-based request signing to ensure data integrity during transmission.
-
-### Signing Algorithm
-
-1. **Client Side**: 
-   - Base64 encode the request parameters
-   - Sign the encoded parameters with `app_secret` using SHA256
-   - Include the signature in each request
-
-2. **Server Side**:
-   - Recalculate the signature using the same algorithm
-   - Compare signatures to verify request authenticity
-
-All requests are automatically signed by the SDK - no manual intervention required.
-
-## Important Notes
-
-- **URI and Query Parameters**: For all requests, URI and GET parameters are separated. For example, for `https://apiv4.local.com/V4/version?v=1`, the `v=1` parameter must be passed through `ReqParams.Query`, not in the URI.
-
-- **Request Format**: All requests use JSON format by default.
-
-- **Response Format**: All responses are in JSON format.
-
-## Error Handling
-
-The SDK returns errors in two ways:
-
-1. **Network/HTTP Errors**: Returned as `error` in the function return value
-2. **Business Logic Errors**: Indicated by `BizCode != 1` in the `Response` struct
-
-Always check both:
-
-```go
-resp, err := sdkObj.Get(api, reqParams)
+resp, err := client.ListDomains(&edgenext.ListDomainsRequest{Page: 1})
 if err != nil {
-    // Handle network/HTTP errors
-    fmt.Printf("Request failed: %v\n", err)
+    fmt.Printf("request failed: %v\n", err)
     return
 }
 
-if resp.BizCode != 1 {
-    // Handle business logic errors
-    fmt.Printf("Business error: %s (code: %d)\n", resp.BizMsg, resp.BizCode)
-    return
-}
-
-// Success
-fmt.Println("Data:", resp.BizData)
+fmt.Println(resp.Data.Total)
 ```
 
-## Debug Mode
+## Signing
 
-Enable debug mode to get detailed request/response information:
+The SDK signs every request automatically. You only need to provide `AppId` and `AppSecret`.
 
-```go
-sdkObj := sdk.Sdk{
-    AppId:     "your_app_id",
-    AppSecret: "your_app_secret",
-    ApiPre:    "your_api_prefix",
-    Debug:     true, // Enable debug mode
-}
-```
+The signer adds SDK authentication headers, request metadata, and an HMAC-SHA256 signature before sending the HTTP request.
+
+## Notes
+
+- Do not hard-code `AppId` or `AppSecret` in source code. Use environment variables, secret managers, or encrypted configuration.
+- `ApiPre` should be the endpoint prefix assigned to your account or environment.
+- Do not put query strings directly in the API path. Use `ReqParams.Query` instead.
+- Request bodies are sent as JSON.
+- Responses are expected to be JSON with a `status` object.
 
 ## Support
 
-For API endpoint configuration and other inquiries, please contact the EdgeNext operations team.
-
-Visit [edgenext.com](https://www.edgenext.com/) for more information.
+For API endpoint configuration, credentials, and API behavior questions, contact the EdgeNext operations or support team.
